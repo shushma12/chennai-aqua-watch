@@ -78,14 +78,18 @@ const WaterQualityMap = ({ lakes, onLakeClick }: WaterQualityMapProps) => {
 
       const marker = L.marker(lake.position, { icon })
         .addTo(map.current!)
-        .on('click', () => onLakeClick(lake));
+        .on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          onLakeClick(lake);
+        });
 
-      // Add tooltip
+      // Add tooltip on hover only
       marker.bindTooltip(lake.name, {
         permanent: false,
         direction: 'top',
         offset: [0, -32],
         className: 'lake-tooltip',
+        opacity: 0.9,
       });
 
       markers.current.push(marker);
@@ -94,7 +98,7 @@ const WaterQualityMap = ({ lakes, onLakeClick }: WaterQualityMapProps) => {
 
   return (
     <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg">
-      <div ref={mapContainer} className="absolute inset-0" />
+      <div ref={mapContainer} className="absolute inset-0 z-0" />
       
       {/* Map Legend */}
       <div className="absolute bottom-4 right-4 bg-card/95 backdrop-blur-sm p-4 rounded-lg shadow-md border border-border">

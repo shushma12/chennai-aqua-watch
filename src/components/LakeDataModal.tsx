@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lake } from '@/types/lake';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ const LakeDataModal = ({ lake, open, onOpenChange }: LakeDataModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[9999]">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -43,6 +43,9 @@ const LakeDataModal = ({ lake, open, onOpenChange }: LakeDataModalProps) => {
                 <Droplets className="h-6 w-6 text-primary" />
                 {lake.name}
               </DialogTitle>
+              <DialogDescription className="sr-only">
+                View detailed water quality data and analytics for {lake.name}
+              </DialogDescription>
               <div className="flex items-center gap-2 mt-2">
                 {getStatusBadge()}
                 {lake.hasIoT && (
