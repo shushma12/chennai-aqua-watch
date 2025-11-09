@@ -11,14 +11,23 @@ interface HistoricalDataPanelProps {
 const HistoricalDataPanel = ({ lake }: HistoricalDataPanelProps) => {
   const data = lake.historicalData;
   
-  // Get last 5 days of data
-  const fiveDaysAgo = new Date();
-  fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+  // Sort all data by date (most recent first) and get unique dates
+  const sortedData = [...data].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
-  const recentData = data.filter(record => {
-    const recordDate = new Date(record.date);
-    return recordDate >= fiveDaysAgo;
-  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Most recent first
+  // Get unique dates from the data
+  const uniqueDates = Array.from(new Set(sortedData.map(record => {
+    const date = new Date(record.date);
+    return date.toISOString().split('T')[0]; // Get just the date part (YYYY-MM-DD)
+  })));
+  
+  // Get the most recent 5 unique dates
+  const recentDates = uniqueDates.slice(0, 5);
+  
+  // Filter records that fall within those 5 most recent dates
+  const recentData = sortedData.filter(record => {
+    const recordDateStr = new Date(record.date).toISOString().split('T')[0];
+    return recentDates.includes(recordDateStr);
+  });
 
   return (
     <div className="space-y-6">
