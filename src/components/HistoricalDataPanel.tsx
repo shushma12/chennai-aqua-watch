@@ -1,5 +1,7 @@
 import { Lake } from '@/types/lake';
 import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface HistoricalDataPanelProps {
@@ -8,9 +10,58 @@ interface HistoricalDataPanelProps {
 
 const HistoricalDataPanel = ({ lake }: HistoricalDataPanelProps) => {
   const data = lake.historicalData;
+  
+  // Get last 5 days of data
+  const fiveDaysAgo = new Date();
+  fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+  
+  const recentData = data.filter(record => {
+    const recordDate = new Date(record.date);
+    return recordDate >= fiveDaysAgo;
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Most recent first
 
   return (
     <div className="space-y-6">
+      {/* Scrollable 5-Day Records Table */}
+      <Card className="p-4">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">Last 5 Days Records ({recentData.length} readings)</h3>
+        <ScrollArea className="h-[400px] w-full rounded-md border border-border">
+          <Table>
+            <TableHeader className="sticky top-0 bg-card z-10">
+              <TableRow>
+                <TableHead className="font-semibold">Date & Time</TableHead>
+                <TableHead className="font-semibold text-right">Temp (°C)</TableHead>
+                <TableHead className="font-semibold text-right">pH</TableHead>
+                <TableHead className="font-semibold text-right">TDS (ppm)</TableHead>
+                <TableHead className="font-semibold text-right">Turbidity</TableHead>
+                <TableHead className="font-semibold text-right">Algae (%)</TableHead>
+                <TableHead className="font-semibold text-right">Waste (%)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentData.map((record, index) => (
+                <TableRow key={index} className="hover:bg-muted/50">
+                  <TableCell className="font-medium">
+                    {new Date(record.date).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </TableCell>
+                  <TableCell className="text-right">{record.temperature.toFixed(1)}</TableCell>
+                  <TableCell className="text-right">{record.ph.toFixed(1)}</TableCell>
+                  <TableCell className="text-right">{record.tds.toFixed(0)}</TableCell>
+                  <TableCell className="text-right">{record.turbidity.toFixed(1)}</TableCell>
+                  <TableCell className="text-right">{record.algaeGrowth.toFixed(1)}</TableCell>
+                  <TableCell className="text-right">{record.industrialWaste.toFixed(0)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+      </Card>
       {/* Water Quality Parameters */}
       <Card className="p-4">
         <h3 className="text-lg font-semibold mb-4 text-foreground">Water Quality Parameters (30 Days)</h3>
